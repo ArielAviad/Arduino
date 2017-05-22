@@ -1,17 +1,24 @@
 /**
  * This turn on and off the LED light on btn click.
  */
+
+ #define DEBUG 1
  
 const int switchPin = 8;
-const int ledPin = 13;
+const int ledPin = 12;
 
-boolean isOn = false;
+unsigned int ledLevel = 0;
 boolean lastButton = LOW;
 boolean currentButton = LOW;
 
 void setup() {
   pinMode(switchPin,INPUT);
   pinMode(ledPin,OUTPUT);
+  pinMode(13,OUTPUT);
+  digitalWrite(13,LOW);
+  #if DEBUG==1
+  Serial.begin(9600);
+  #endif
 }
 
 void loop() {
@@ -19,10 +26,16 @@ void loop() {
   currentButton = debounce(lastButton);
   
   if(lastButton == LOW && currentButton == HIGH){
-    isOn = !isOn;
+    ledLevel += 51;
+    if(ledLevel > 255)
+      ledLevel = 0;
+    #if DEBUG==1
+    Serial.println(ledLevel);
+    #endif
   }
   lastButton = currentButton;
-  digitalWrite(ledPin,isOn);
+  analogWrite(ledPin,ledLevel);
+
 }
 
 //resolve the bounce of the btn problome.
